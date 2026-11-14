@@ -1,6 +1,6 @@
-﻿# Shelfwise
+# Shelfwise
 
-A retail demand and reorder agent built with TanStack Start, React, TypeScript, pnpm, Convex, and NVIDIA NIM (`meta/muse-glimmer-30b`). Netlify build configuration is included; the app has not been published.
+A retail demand and reorder agent built with TanStack Start, React, TypeScript, pnpm, Convex, and NVIDIA NIM (`nvidia/nemotron-3.5-bolt-e4b`). Netlify build configuration is included; the app has not been published.
 
 ## Run
 
@@ -32,7 +32,7 @@ Reorders prioritize products with the lowest historical stock coverage. Target s
 
 ## Data and prediction limits
 
-The six products, inventory, costs, suppliers, and 28 daily sales values are synthetic demonstration data (`src/lib/inventory.ts`). Before AI analysis, the app repeats last week's sales as an explicitly labelled local baseline. Muse Glimmer generates unvalidated LLM demand estimates, not a trained or backtested forecasting model. The chart shows forecast **daily average**, not individual daily predictions. No accuracy claim is made. Review perishability, pack sizes, and assumptions before real purchasing.
+The six products, inventory, costs, suppliers, and 28 daily sales values are synthetic demonstration data (`src/lib/inventory.ts`). Before AI analysis, the app repeats last week's sales as an explicitly labelled local baseline. Nemotron 3.5 Bolt E4B generates unvalidated LLM demand estimates, not a trained or backtested forecasting model. The chart shows forecast **daily average**, not individual daily predictions. No accuracy claim is made. Review perishability, pack sizes, and assumptions before real purchasing.
 
 This is a shared demo workspace without authentication. Add authentication, ownership checks, and rate limits before exposing the deployment for real use.
 

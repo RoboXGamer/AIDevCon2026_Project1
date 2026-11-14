@@ -7,5 +7,5 @@ const result = await client.action(makeFunctionReference('agent:analyze'), { pro
 assert.equal(result.predictions.length,6)
 assert(result.predictions.every(p=>Number.isInteger(p.predictedUnits)&&p.predictedUnits>=0))
 const snapshot = await client.query(makeFunctionReference('retail:latest'),{})
-assert.equal(snapshot.forecast.source,'Muse Glimmer 30B')
+assert.equal(snapshot.forecast.source,'Nemotron 3.5 Bolt E4B')
 console.log(JSON.stringify({source:result.source,predictions:result.predictions,trace:result.trace,persisted:!!snapshot.forecast},null,2))
