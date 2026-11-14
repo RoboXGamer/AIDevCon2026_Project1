@@ -74,12 +74,15 @@ export const analyze = action({
             tool_choice:
               step === 0
                 ? { type: "function", function: { name: "get_sales_history" } }
-                : "auto",
-            temperature: 0.2,
-            max_tokens: 4096,
+                : { type: "function", function: { name: "submit_forecast" } },
+            temperature: 0.95,
+            top_p: 1,
+            reasoning_effort: "low",
+            chat_template_kwargs: { reasoning_strength: "low" },
+            max_tokens: step === 0 ? 512 : 2048,
             stream: false,
           }),
-          signal: AbortSignal.timeout(90000),
+          signal: AbortSignal.timeout(180000),
         },
       );
       if (!response.ok)
