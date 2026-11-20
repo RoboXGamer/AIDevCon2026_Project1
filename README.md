@@ -1,40 +1,40 @@
 # Shelfwise
 
-A retail demand and reorder agent built with TanStack Start, React, TypeScript, pnpm, Convex, and NVIDIA NIM (`nvidia/nemotron-3.5-bolt-e4b`). Netlify build configuration is included; the app has not been published.
+Shelfwise turns sample retail sales and inventory into a seven-day demand estimate and a budgeted purchase order draft. Built for SAP Labs' AI DevCon 2.0, it shows how an LLM can use sales data while application code handles inventory and spending rules.
 
-## Run
+**[Open the live demo](https://aidevcon.netlify.app/)** · The dashboard uses the name **StockPulse**.
+
+## Try it
+
+1. Open **Demand & Reorder**. The starting baseline repeats the previous seven days of sales.
+2. Click **Run Forecast** with the default prompt or try the weekend promotion scenario. Open **Forecast Details** to review estimates and the model's reasoning by product.
+3. Set a purchase budget in INR, select products, and review and save a purchase order draft.
+4. Open **Purchase Orders** to review saved drafts and export them as CSV.
+
+## How it works
+
+- **Estimate demand.** A Convex action calls NVIDIA NIM (Nemotron 3.5 Bolt E4B). The model uses `get_sales_history` to retrieve sample sales and `submit_forecast` to return a seven-day unit total for each SKU. The action validates the response and persists it in Convex.
+- **Plan purchases.** TypeScript code allocates the budget to products with the lowest historical stock coverage first. Target stock covers seven forecast days plus supplier lead time, with a 15% buffer. The planner subtracts stock on hand and caps quantities to fit the remaining budget.
+- **Review results.** The TanStack Start and React dashboard displays stockout risk, forecasts, and recommended reorder quantities. Convex stores saved drafts for review and CSV export. The app never sends orders to suppliers.
+
+The [sample inventory](src/lib/inventory.ts) contains six products with 28 days of synthetic sales per product, plus stock levels, costs, suppliers, and lead times. The chart shows the forecast daily average. Demand estimates are unvalidated and have never been backtested. The hosted demo is a shared workspace without sign-in.
+
+## Run locally
+
+You'll need Node.js, pnpm, a Convex development deployment, and an NVIDIA API key with access to `nvidia/nemotron-3.5-bolt-e4b` for model calls.
 
 ```sh
 pnpm install
 pnpm convex dev
 ```
 
-Convex writes `VITE_CONVEX_URL` into `.env.local`. Set `NVIDIA_API_KEY` in the Convex dashboard under deployment settings → environment variables. Alternatively, put it in `.env.local` and run `node scripts/sync-nvidia-key.mjs` to transfer it securely to Convex. Never prefix the NVIDIA key with `VITE_`.
+Convex writes `VITE_CONVEX_URL` to `.env.local`. Add `NVIDIA_API_KEY` to the Convex deployment's environment variables in the dashboard. Keep the key on the server and omit the `VITE_` prefix.
 
-In another terminal:
+In another terminal, start the app and open [localhost:3000](http://localhost:3000).
 
 ```sh
 pnpm dev
 ```
-
-Open http://localhost:3000.
-
-## Demo flow
-
-1. Inspect the sample inventory and last-week baseline.
-2. Click **Run demand forecast**. The model calls `get_sales_history`, then `submit_forecast`; the server validates all six predictions and saves them in Convex.
-3. Select a product to inspect sales and the seven-day forecast average.
-4. Try the weekend promotion scenario and rerun the forecast.
-5. Set a purchase budget, review the reorder draft, then save it.
-6. Open **Purchase orders** and export a CSV.
-
-Reorders prioritize products with the lowest historical stock coverage. Target stock covers seven forecast days plus supplier lead time with a 15% buffer. Quantities stay within the budget. All orders are drafts; nothing is sent to suppliers.
-
-## Data and prediction limits
-
-The six products, inventory, costs, suppliers, and 28 daily sales values are synthetic demonstration data (`src/lib/inventory.ts`). Before AI analysis, the app repeats last week's sales as an explicitly labelled local baseline. Nemotron 3.5 Bolt E4B generates unvalidated LLM demand estimates, not a trained or backtested forecasting model. The chart shows forecast **daily average**, not individual daily predictions. No accuracy claim is made. Review perishability, pack sizes, and assumptions before real purchasing.
-
-This is a shared demo workspace without authentication. Add authentication, ownership checks, and rate limits before exposing the deployment for real use.
 
 ## Checks
 
@@ -42,7 +42,6 @@ This is a shared demo workspace without authentication. Add authentication, owne
 pnpm exec tsc --noEmit
 pnpm build
 node scripts/check-reorder.mjs
-node scripts/smoke.mjs
 ```
 
-The smoke test makes a real NVIDIA API request and saves a forecast to the configured development Convex deployment. It requires a valid key and model access.
+To verify the model and persistence together, run `node scripts/smoke.mjs` against a configured development deployment. It makes a real NVIDIA API call and writes a forecast to that deployment.
