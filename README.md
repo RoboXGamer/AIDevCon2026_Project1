@@ -4,6 +4,19 @@ Shelfwise turns sample retail sales and inventory into a seven-day demand estima
 
 **[Open the live demo](https://aidevcon.netlify.app/)** · The dashboard uses the name **StockPulse**.
 
+## Technical architecture
+
+| Layer | Technology | Responsibility |
+| --- | --- | --- |
+| Deployment | **Netlify** | Hosts the TanStack Start app using the Netlify Vite adapter. |
+| Frontend | **TanStack Start**, **React 19**, **TypeScript**, **Tailwind CSS** | Renders inventory, forecast details, and the purchase order workflow. |
+| Backend | **Convex Actions, Queries, and Mutations** | Calls the model server-side, validates forecasts and draft entries, and gives the dashboard a reactive query for saved results. |
+| Database | **Convex DB** | Persists forecast runs and purchase order drafts in separate schema-defined tables. |
+| AI inference | **NVIDIA NIM**, **Nemotron 3.5 Bolt E4B** | Generates seven-day demand estimates through structured tool calls. The NVIDIA API key lives in the Convex deployment environment. |
+| Reorder logic | **TypeScript** | Calculates quantities from forecast demand, stock, lead times, and the selected budget. |
+
+When a user runs a forecast, the dashboard calls a Convex action, which sends the request to NVIDIA NIM. Convex validates the model's response before storing it, and the reactive query updates the dashboard. The frontend calculates the reorder plan from the saved forecast, then sends the reviewed draft to a Convex mutation.
+
 ## Try it
 
 1. Open **Demand & Reorder**. The starting baseline repeats the previous seven days of sales.
